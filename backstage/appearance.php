@@ -17,6 +17,8 @@ if (isset($_POST['form_sent'])) {
 	
 	$form = array(
 		'default_accent'		=> intval($_POST['form']['default_accent']),
+		'allow_accent_color'	=> isset($_POST['form']['allow_accent_color']) ? '1' : '0',
+		'allow_night_mode'		=> isset($_POST['form']['allow_night_mode']) ? '1' : '0',
 		'show_user_info'		=> isset($_POST['form']['show_user_info']) ? '1' : '0',
 		'show_post_count'		=> isset($_POST['form']['show_post_count']) ? '1' : '0',
 		'moderated_by'			=> isset($_POST['form']['moderated_by']) ? '1' : '0',
@@ -34,7 +36,7 @@ if (isset($_POST['form_sent'])) {
 		'custom_copyright'		=> luna_trim($_POST['form']['custom_copyright']),
 	);
 
-	// Make sure the number of displayed topics and posts is between 3 and 75
+	// Make sure the number of displayed threads and comments is between 3 and 75
 	if ($form['disp_topics_default'] < 3)
 		$form['disp_topics_default'] = 3;
 	elseif ($form['disp_topics_default'] > 75)
@@ -84,6 +86,24 @@ if (isset($_GET['saved']))
 		<div class="panel-body">
 			<fieldset>
 				<div class="form-group">
+					<label class="col-sm-3 control-label"><?php _e('Theme settings', 'luna') ?></label>
+					<div class="col-sm-9">
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" name="form[allow_accent_color]" value="1" <?php if ($luna_config['o_allow_accent_color'] == '1') echo ' checked' ?> />
+								<?php _e('Allow users to set their own accent color.', 'luna') ?>
+							</label>
+						</div>
+						<div class="checkbox">
+							<label>
+								<input type="checkbox" name="form[allow_night_mode]" value="1" <?php if ($luna_config['o_allow_night_mode'] == '1') echo ' checked' ?> />
+								<?php _e('Allow users to change the night mode settings.', 'luna') ?>
+							</label>
+						</div>
+					</div>
+				</div>
+				<hr />
+				<div class="form-group">
 					<label class="col-sm-3 control-label"><?php _e('Color', 'luna') ?></label>
 					<div class="col-sm-9">
 						<div class="btn-group accent-group" data-toggle="buttons">
@@ -107,13 +127,13 @@ if (isset($_GET['saved']))
 						<div class="checkbox">
 							<label>
 								<input type="checkbox" name="form[show_user_info]" value="1" <?php if ($luna_config['o_show_user_info'] == '1') echo ' checked' ?> />
-								<?php _e('Show information about the poster under the username in topic view.', 'luna') ?>
+								<?php _e('Show information about the commenter under the username in threads.', 'luna') ?>
 							</label>
 						</div>
 						<div class="checkbox">
 							<label>
 								<input type="checkbox" name="form[show_post_count]" value="1" <?php if ($luna_config['o_show_post_count'] == '1') echo ' checked' ?> />
-								<?php _e('Show the number of posts a user has made in topic view, profile and user list.', 'luna') ?>
+								<?php _e('Show the number of comments a user has made in threads, profile and the user list.', 'luna') ?>
 							</label>
 						</div>
 					</div>
@@ -152,19 +172,19 @@ if (isset($_GET['saved']))
 				</div>
 				<hr />
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?php _e('Topic review', 'luna') ?><span class="help-block"><?php _e('Maximum amount of posts showed when posting', 'luna') ?></span></label>
+					<label class="col-sm-3 control-label"><?php _e('Thread review', 'luna') ?><span class="help-block"><?php _e('Maximum amount of comments showed when commenting', 'luna') ?></span></label>
 					<div class="col-sm-9">
 						<input type="text" class="form-control" name="form[topic_review]" maxlength="2" value="<?php echo $luna_config['o_topic_review'] ?>" />
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?php _e('Topics per page', 'luna') ?><span class="help-block"><?php _e('Default amount of topics per page', 'luna') ?></span></label>
+					<label class="col-sm-3 control-label"><?php _e('Threads per page', 'luna') ?><span class="help-block"><?php _e('Default amount of Threads per page', 'luna') ?></span></label>
 					<div class="col-sm-9">
 						<input type="text" class="form-control" name="form[disp_topics_default]" maxlength="2" value="<?php echo $luna_config['o_disp_topics_default'] ?>" />
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="col-sm-3 control-label"><?php _e('Posts per page', 'luna') ?><span class="help-block"><?php _e('Default amount of posts per page', 'luna') ?></span></label>
+					<label class="col-sm-3 control-label"><?php _e('Comments per page', 'luna') ?><span class="help-block"><?php _e('Default amount of Comments per page', 'luna') ?></span></label>
 					<div class="col-sm-9">
 						<input type="text" class="form-control" name="form[disp_posts_default]" maxlength="3" value="<?php echo $luna_config['o_disp_posts_default'] ?>" />
 					</div>

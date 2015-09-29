@@ -89,7 +89,7 @@ if (file_exists(FORUM_ROOT.'config.php')) {
 
 	// If FORUM is defined, config.php is probably valid and thus the software is installed
 	if (defined('FORUM'))
-		draw_wall_error(__('It seems like Luna is already installed.', 'luna'), '<a class="btn btn-default" href="index.php">Continue</a>', __('Let\'s get started', 'luna'));
+		draw_wall_error(__('It seems like Luna is already installed.', 'luna'), '<a class="btn btn-default btn-lg" href="index.php">'.__('Continue', 'luna').'</a>', __('We\'re done here', 'luna'));
 		exit;
 }
 
@@ -124,7 +124,7 @@ if (!isset($_POST['form_sent'])) {
 
 	$db_type = $db_name = $db_username = $db_prefix = $username = $email = '';
 	$db_host = 'localhost';
-	$title = __('My Luna Forum', 'luna');
+	$title = Version::LUNA_CODE_NAME_SEM;
 	$description = __('You can do anything', 'luna');
 	$default_lang = $install_lang;
 	$default_style = Installer::DEFAULT_STYLE;
@@ -176,7 +176,7 @@ if (!isset($_POST['form_sent']) || !empty($alerts)) {
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title><?php _e('Luna Installation', 'luna') ?></title>
-		<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="include/css/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="backstage/css/style.css" />
 		<script type="text/javascript">
 		/* <![CDATA[ */
@@ -469,7 +469,7 @@ echo "\t\t\t\t\t\t".$cur_alert.'<br />'."\n";
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<title><?php _e('Luna Installation', 'luna') ?></title>
-		<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="include/css/bootstrap.min.css" />
 		<link rel="stylesheet" type="text/css" href="backstage/css/style.css" />
 	</head>
 	<body>

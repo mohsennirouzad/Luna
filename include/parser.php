@@ -50,7 +50,7 @@ function preparse_bbcode($text, &$errors, $is_signature = false) {
 		if ($new_text != $text) {
 			$text = $new_text;
 			if ($new_text == '') {
-				$errors[] = __('It seems your post consisted of empty BBCodes only. It is possible that this happened because e.g. the innermost quote was discarded because of the maximum quote depth level.', 'luna');
+				$errors[] = __('It seems your comment consisted of empty BBCodes only. It is possible that this happened because e.g. the innermost quote was discarded because of the maximum quote depth level.', 'luna');
 				return '';
 			}
 		} else
@@ -106,7 +106,7 @@ function preparse_bbcode($text, &$errors, $is_signature = false) {
 		if ($new_text != $text) {
 			$text = $new_text;
 			if ($new_text == '') {
-				$errors[] = __('It seems your post consisted of empty BBCodes only. It is possible that this happened because e.g. the innermost quote was discarded because of the maximum quote depth level.', 'luna');
+				$errors[] = __('It seems your comment consisted of empty BBCodes only. It is possible that this happened because e.g. the innermost quote was discarded because of the maximum quote depth level.', 'luna');
 				break;
 			}
 		} else
@@ -847,12 +847,26 @@ function parse_message($text) {
 
 					if ($language == 'html' || $language == 'xhtml' || $language == 'xml') { // Markup case
 						$h_class = ' class="language-markup"';
-					} elseif ($language == 'php' || $language == 'c++' || $language == 'perl') { // C-like languages case
-						$h_class = ' class="language-clike"';
+					} elseif ($language == 'c') { // C case
+						$h_class = ' class="language-c"';
+					} elseif ($language == 'c#') { // C# case
+						$h_class = ' class="language-csharp"';
+					} elseif ($language == 'c++') { // C++ case
+						$h_class = ' class="language-cpp"';
+					} elseif ($language == 'java') { // Java case
+						$h_class = ' class="language-java"';
 					} elseif ($language == 'javascript') { // JavaScript case
 						$h_class = ' class="language-javascript"';
-					} elseif ($language == 'php') { // C-like languages case
+					} elseif ($language == 'markdown') { // MarkDown case
+						$h_class = ' class="language-markdown"';
+					} elseif ($language == 'pascal') { // Pascal case
+						$h_class = ' class="language-pascal"';
+					} elseif ($language == 'php') { // PHP case
 						$h_class = ' class="language-php"';
+					} elseif ($language == 'python') { // Python case
+						$h_class = ' class="language-python"';
+					} elseif ($language == 'sql') { // SQL case
+						$h_class = ' class="language-sql"';
 					} else { // Other cases
 						$h_class = '';
 					}

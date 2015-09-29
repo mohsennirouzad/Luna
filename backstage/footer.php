@@ -34,10 +34,33 @@ if (defined('FORUM_DEBUG')) {
 $db->end_transaction();
 
 ?>
+				</div>
 			</div>
 		</div>
-		<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
-		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<script src="../include/js/vendor/jquery.js"></script>
+		<script src="../include/js/vendor/bootstrap.min.js"></script>
+		<script src="../include/js/vendor/colours.min.js"></script>
+		<script language="javascript">
+			var flat_palette = [
+				"#1abc9c", "#64b450", "#38a2eb", "#826eb4", "#555555",
+				"#16a085", "#338e1c", "#136cab", "#644e9c", "#333333",
+				"#ffb900", "#f56e28", "#dc3232", "#e87ece", "#dddddd",
+				"#f39c12", "#d35400", "#ab1515", "#b74b9c", "#999999",
+			];
+
+			$(document).ready(function(){
+
+				$('#color').colours({
+					palette: flat_palette,
+					color: '#95a5a6',
+					width: 39,
+					show_field: true,
+					palette_size: 42,
+					palette_row_count: 5,
+				});
+
+			});
+		</script>
 	</body>
 </html>
 <?php

@@ -60,7 +60,7 @@ if (isset($_REQUEST['markread'])) {
 	
 	$db->query('UPDATE '.$db->prefix.'messages SET showed=0 WHERE shared_id IN ('.$idlist.') AND owner=\''.$luna_user['id'].'\' AND show_message=1') or error('Unable to update the status of the messages', __FILE__, __LINE__, $db->error());
 	redirect('inbox.php');
-} elseif (isset($_REQUEST['delete_multiple'])) { // Delete posts
+} elseif (isset($_REQUEST['delete_multiple'])) { // Delete comments
 	confirm_referrer('inbox.php');
 
 	if (empty($_POST['selected_messages']))
@@ -91,6 +91,15 @@ $limit = $start_from.','.$luna_config['o_pms_mess_per_page'];
 
 // Start building page
 $page_title = array(luna_htmlspecialchars($luna_config['o_board_title']), __('Private Messages', 'luna'), __('Inbox', 'luna'));
+
+$result = $db->query('SELECT username, title FROM '.$db->prefix.'users WHERE id='.$id) or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+if (!$db->num_rows($result))
+	message(__('Bad request. The link you followed is incorrect, outdated or you are simply not allowed to hang around here.', 'luna'), false, '404 Not Found');
+
+$user = $db->fetch_assoc($result);
+
+$user_username = luna_htmlspecialchars($user['username']);
+$user_usertitle = get_title($user);
 
 define('FORUM_ACTIVE_PAGE', 'pm');
 require load_page('header.php');

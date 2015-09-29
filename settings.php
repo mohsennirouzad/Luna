@@ -126,12 +126,12 @@ if (isset($_POST['update_group_membership'])) {
 		// Remove him/her from the online list (if they happen to be logged in)
 		$db->query('DELETE FROM '.$db->prefix.'online WHERE user_id='.$id) or error('Unable to remove user from online list', __FILE__, __LINE__, $db->error());
 
-		// Should we delete all posts made by this user?
+		// Should we delete all comments made by this user?
 		if (isset($_POST['delete_posts'])) {
 			require FORUM_ROOT.'include/search_idx.php';
 			@set_time_limit(0);
 
-			// Find all posts made by this user
+			// Find all comments made by this user
 			$result = $db->query('SELECT p.id, p.topic_id, t.forum_id FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'topics AS t ON t.id=p.topic_id INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id WHERE p.poster_id='.$id) or error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
 			if ($db->num_rows($result)) {
 				while ($cur_post = $db->fetch_assoc($result)) {
@@ -531,7 +531,7 @@ To change your email address, please visit the following page:
 	redirect('settings.php?id='.$id);
 } else {
 	
-	$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.facebook, u.msn, u.twitter, u.google, u.location, u.signature, u.disp_topics, u.disp_posts, u.use_pm, u.email_setting, u.notify_with_post, u.auto_notify, u.show_smilies, u.show_img, u.show_img_sig, u.show_avatars, u.show_sig, u.timezone, u.dst, u.language, u.style, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, u.color_scheme, u.adapt_time, u.accent, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id) or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT u.username, u.email, u.title, u.realname, u.url, u.facebook, u.msn, u.twitter, u.google, u.location, u.signature, u.disp_topics, u.disp_posts, u.use_pm, u.email_setting, u.notify_with_post, u.auto_notify, u.show_smilies, u.show_img, u.show_img_sig, u.show_avatars, u.show_sig, u.timezone, u.dst, u.language, u.style, u.num_posts, u.last_post, u.registered, u.registration_ip, u.admin_note, u.date_format, u.time_format, u.last_visit, u.color_scheme, u.enforce_accent, u.adapt_time, u.accent, g.g_id, g.g_user_title, g.g_moderator FROM '.$db->prefix.'users AS u LEFT JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id WHERE u.id='.$id) or error('Unable to fetch user info', __FILE__, __LINE__, $db->error());
 	if (!$db->num_rows($result))
 		message(__('Bad request. The link you followed is incorrect, outdated or you are simply not allowed to hang around here.', 'luna'), false, '404 Not Found');
 	
@@ -550,10 +550,13 @@ To change your email address, please visit the following page:
 	
 		if ($luna_config['o_regs_verify'] == '1') {
 			$email_field = '<input type="text" class="form-control" name="req_email" value="'.luna_htmlspecialchars($user['email']).'" maxlength="80" disabled />';
-			$email_button = '<span class="input-group-btn"><a class="btn btn-primary" href="#" data-toggle="modal" data-target="#newmail">'.__('Change email address', 'luna').'</a></span>';
+			if (isset($user['activate_string']) && isset($user['activate_key']))
+				$email_button = '<span class="input-group-btn"><a class="btn btn-primary" href="#" data-toggle="modal" data-target="#newmail">'.__('Change email address', 'luna').'</a></span>';
+			else
+				$email_button = '<span class="input-group-btn"><a class="btn btn-danger disabled" href="#" data-toggle="modal" data-target="#newmail">'.__('Unverified', 'luna').'</a></span>';
 		} else {
 			$email_field = '<input type="text" class="form-control" name="req_email" value="'.$user['email'].'" maxlength="80" />';
-			$email_button = '<span class="input-group-btn"><a class="btn btn-danger disabled" href="#" data-toggle="modal" data-target="#newmail">'.__('Unverified', 'luna').'</a></span>';
+			$email_button = '<span class="input-group-btn"><a class="btn btn-primary" href="#" data-toggle="modal" data-target="#newmail">'.__('Change email address', 'luna').'</a></span>';
 		}
 	}
 	
@@ -592,6 +595,7 @@ To change your email address, please visit the following page:
 			'twitter'			=> luna_trim($_POST['form']['twitter']),
 			'google'			=> luna_trim($_POST['form']['google']),
 			'color_scheme'		=> luna_trim($_POST['form']['color_scheme']),
+			'enforce_accent'	=> isset($_POST['form']['enforce_accent']) ? '1' : '0',
 			'adapt_time'		=> intval($_POST['form']['adapt_time']),
 			'accent'			=> luna_trim($_POST['form']['accent']),
 			'timezone'			=> floatval($_POST['form']['timezone']),
@@ -614,7 +618,7 @@ To change your email address, please visit the following page:
 		if ($luna_user['is_admmod']) {
 			$form['admin_note'] = luna_trim($_POST['admin_note']);
 	
-			// We only allow administrators to update the post count
+			// We only allow administrators to update the comment count
 			if ($luna_user['g_id'] == FORUM_ADMIN)
 				$form['num_posts'] = intval($_POST['num_posts']);
 		}
@@ -803,6 +807,9 @@ To change your email address, please visit the following page:
 		$signature_preview = $parsed_signature;
 	else
 		$signature_preview = __('No signature currently stored in profile.', 'luna');
+	
+	$user_username = luna_htmlspecialchars($user['username']);
+	$user_usertitle = get_title($user);
 
 	$page_title = array(luna_htmlspecialchars($luna_config['o_board_title']), __('Profile', 'luna'), __('Settings', 'luna'));
 	define('FORUM_ACTIVE_PAGE', 'me');

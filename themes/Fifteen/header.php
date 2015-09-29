@@ -1,25 +1,29 @@
 <?php
 require ('header.php');
 
-$body_classes = check_night_mode();
+$body_classes = check_style_mode();
 ?>
 <!DOCTYPE html>
 <html class="<?php echo $body_classes ?>">
 	<head>
-		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="include/css/bootstrap.min.css">
+		<link rel="stylesheet" href="include/css/font-awesome.min.css">
 		<link rel="stylesheet" type="text/css" href="include/css/prism.css" />
-		<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
-		<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<script src="include/js/vendor/jquery.js"></script>
+		<script src="include/js/vendor/bootstrap.min.js"></script>
 		<script src="include/js/vendor/prism.js"></script>
 		<?php load_meta(); ?>
 		<style>
 		.emoji {
 			font-size: <?php echo $luna_config['o_emoji_size'] ?>px;
 		}
+		body.js .hide-if-js, body.no-js .hide-if-no-js {
+			display: none !important;
+		}
 		</style>
 	</head>
-	<body>
+	<body class="no-js">
+		<script type="text/javascript">document.body.className = document.body.className.replace( 'no-js', 'js' );</script>
 		<?php if ($luna_user['is_guest']): require load_page('login.php'); endif; ?>
 		<div class="container container-main" id="main">
 			<div id="header">
@@ -41,7 +45,7 @@ $body_classes = check_night_mode();
 									<input type="hidden" name="action" value="search" />
 									<div class="form-group">
 										<div class="input-group">
-											<input class="form-control" type="text" name="keywords" placeholder="<?php _e('Search in posts', 'luna') ?>" maxlength="100" />
+											<input class="form-control" type="text" name="keywords" placeholder="<?php _e('Search in comments', 'luna') ?>" maxlength="100" />
 											<span class="input-group-btn">
 												<button class="btn btn-default btn-search" type="submit" name="search" accesskey="s">
 													<span class="fa fa-fw fa-search"></span>

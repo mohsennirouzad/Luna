@@ -155,7 +155,7 @@ function authenticate_user($user, $password, $password_is_hash = false) {
 
 
 //
-// Delete topics from $forum_id that are "older than" $prune_date (if $prune_sticky is 1, sticky topics will also be deleted)
+// Delete threads from $forum_id that are "older than" $prune_date (if $prune_sticky is 1, sticky topics will also be deleted)
 //
 function prune($forum_id, $prune_sticky, $prune_date) {
 	global $db;
@@ -181,14 +181,14 @@ function prune($forum_id, $prune_sticky, $prune_date) {
 			$post_ids .= (($post_ids != '') ? ',' : '').$row[0];
 
 		if ($post_ids != '') {
-			// Delete topics
+			// Delete threads
 			$db->query('DELETE FROM '.$db->prefix.'topics WHERE id IN('.$topic_ids.')') or error('Unable to prune topics', __FILE__, __LINE__, $db->error());
 			// Delete subscriptions
 			$db->query('DELETE FROM '.$db->prefix.'topic_subscriptions WHERE topic_id IN('.$topic_ids.')') or error('Unable to prune subscriptions', __FILE__, __LINE__, $db->error());
-			// Delete posts
+			// Delete comments
 			$db->query('DELETE FROM '.$db->prefix.'posts WHERE id IN('.$post_ids.')') or error('Unable to prune posts', __FILE__, __LINE__, $db->error());
 
-			// We removed a bunch of posts, so now we have to update the search index
+			// We removed a bunch of comments, so now we have to update the search index
 			require_once FORUM_ROOT.'include/search_idx.php';
 			strip_search_index($post_ids);
 		}
@@ -702,7 +702,7 @@ function update_forum($forum_id) {
 	$result = $db->query('SELECT COUNT(id), SUM(num_replies) FROM '.$db->prefix.'topics WHERE forum_id='.$forum_id) or error('Unable to fetch forum topic count', __FILE__, __LINE__, $db->error());
 	list($num_topics, $num_posts) = $db->fetch_row($result);
 
-	$num_posts = $num_posts + $num_topics; // $num_posts is only the sum of all replies (we have to add the topic posts)
+	$num_posts = $num_posts + $num_topics; // $num_posts is only the sum of all replies (we have to add the thread posts)
 
 	$result = $db->query('SELECT last_post, last_post_id, last_poster_id FROM '.$db->prefix.'topics WHERE forum_id='.$forum_id.' AND moved_to IS NULL ORDER BY last_post DESC LIMIT 1') or error('Unable to fetch last_post/last_post_id', __FILE__, __LINE__, $db->error());
 	if ($db->num_rows($result)) { // There are topics in the forum
@@ -731,12 +731,12 @@ function delete_avatar($user_id) {
 
 
 //
-// Delete a topic and all of its posts
+// Delete a thread and all of its posts
 //
 function delete_topic($topic_id, $type) {
 	global $db;
 
-	// Delete the topic and any redirect topics
+	// Delete the thread and any redirect topics
 	if ($type == "hard")
 		$db->query('DELETE FROM '.$db->prefix.'topics WHERE id='.$topic_id.' OR moved_to='.$topic_id) or error('Unable to delete topic', __FILE__, __LINE__, $db->error());
 	elseif ($type == "soft")
@@ -744,30 +744,30 @@ function delete_topic($topic_id, $type) {
 	else
 		$db->query('UPDATE '.$db->prefix.'topics SET soft = 0 WHERE id='.$topic_id.' OR moved_to='.$topic_id) or error('Unable to soft delete topic', __FILE__, __LINE__, $db->error());
 
-	// Create a list of the post IDs in this topic
+	// Create a list of the comment IDs in this thread
 	$post_ids = '';
 	$result = $db->query('SELECT id FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id) or error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
 	while ($row = $db->fetch_row($result))
 		$post_ids .= ($post_ids != '') ? ','.$row[0] : $row[0];
 
-	// Make sure we have a list of post IDs
+	// Make sure we have a list of comment IDs
 	if ($post_ids != '') {
 		if ($type == "hard") {
 			decrease_post_counts($post_ids);
 
 			strip_search_index($post_ids);
-			// Delete posts in topic
+			// Delete comments in topic
 			$db->query('DELETE FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id) or error('Unable to delete posts', __FILE__, __LINE__, $db->error());
 		} else {
 			if ($type == "soft")
-				$db->query('UPDATE '.$db->prefix.'posts SET soft = 1 WHERE topic_id='.$topic_id) or error('Unable to soft delete posts', __FILE__, __LINE__, $db->error());
+				$db->query('UPDATE '.$db->prefix.'posts SET soft = 1 WHERE topic_id='.$topic_id) or error('Unable to soft delete comments', __FILE__, __LINE__, $db->error());
 			else
-				$db->query('UPDATE '.$db->prefix.'posts SET soft = 0 WHERE topic_id='.$topic_id) or error('Unable to soft delete posts', __FILE__, __LINE__, $db->error());
+				$db->query('UPDATE '.$db->prefix.'posts SET soft = 0 WHERE topic_id='.$topic_id) or error('Unable to soft delete comments', __FILE__, __LINE__, $db->error());
 		}
 	}
 
 	if ($type != "reset") {
-		// Delete any subscriptions for this topic
+		// Delete any subscriptions for this thread
 		$db->query('DELETE FROM '.$db->prefix.'topic_subscriptions WHERE topic_id='.$topic_id) or error('Unable to delete subscriptions', __FILE__, __LINE__, $db->error());
 	}
 }
@@ -783,7 +783,7 @@ function delete_post($post_id, $topic_id, $poster_id) {
 	list($last_id, ,) = $db->fetch_row($result);
 	list($second_last_id, $second_poster, $second_posted) = $db->fetch_row($result);
 
-	// Delete the post
+	// Delete the comment
 	$db->query('DELETE FROM '.$db->prefix.'posts WHERE id='.$post_id) or error('Unable to delete post', __FILE__, __LINE__, $db->error());
 
 	// Decrement user post count if the user is a registered user
@@ -792,17 +792,17 @@ function delete_post($post_id, $topic_id, $poster_id) {
 
 	strip_search_index($post_id);
 
-	// Count number of replies in the topic
+	// Count number of replies in the thread
 	$result = $db->query('SELECT COUNT(id) FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id) or error('Unable to fetch post count for topic', __FILE__, __LINE__, $db->error());
 	$num_replies = $db->result($result, 0) - 1;
 
-	// If the message we deleted is the most recent in the topic (at the end of the topic)
+	// If the message we deleted is the most recent in the thread (at the end of the thread)
 	if ($last_id == $post_id) {
-		// If there is a $second_last_id there is more than 1 reply to the topic
+		// If there is a $second_last_id there is more than 1 reply to the thread
 		if (!empty($second_last_id))
 			$db->query('UPDATE '.$db->prefix.'topics SET last_post='.$second_posted.', last_post_id='.$second_last_id.', last_poster=\''.$db->escape($second_poster).'\', num_replies='.$num_replies.' WHERE id='.$topic_id) or error('Unable to update topic', __FILE__, __LINE__, $db->error());
 		else
-			// We deleted the only reply, so now last_post/last_post_id/last_poster is posted/id/poster from the topic itself
+			// We deleted the only reply, so now last_post/last_post_id/last_poster is posted/id/poster from the thread itself
 			$db->query('UPDATE '.$db->prefix.'topics SET last_post=posted, last_post_id=id, last_poster=poster, num_replies='.$num_replies.' WHERE id='.$topic_id) or error('Unable to update topic', __FILE__, __LINE__, $db->error());
 	} else
 		// Otherwise we just decrement the reply counter
@@ -1029,11 +1029,8 @@ function message($message, $no_back_link = false, $http_status = null) {
 	require load_page('header.php');
 
 ?>
-
-<div class="container">
-	<h2 style="margin-top: 60px;"><?php _e('We\'ve got us a situation here.', 'luna') ?></h2>
-	<p><?php echo $message ?></p>
-</div>
+<h2 class="profile-title"><?php _e('We\'ve got us a situation here.', 'luna') ?></h2>
+<p><?php echo $message ?></p>
 <?php
 	require load_page('footer.php');
 	
@@ -1073,7 +1070,7 @@ function message_backstage($message, $no_back_link = false, $http_status = null)
 //
 // Check if we have to show a list of subforums
 //
-function is_subforum($id) {
+function is_subforum($id, $self_subforum = '0') {
 	global $db;
 
 	$result = $db->query('SELECT count(*) FROM '.$db->prefix.'forums WHERE parent_id='.$id) or error ('Unable to fetch information about the current forum', __FILE__, __LINE__, $db->error());
@@ -1083,7 +1080,7 @@ function is_subforum($id) {
 		$result = $db->query('SELECT parent_id FROM '.$db->prefix.'forums WHERE id='.$id) or error ('Unable to fetch information about the current forum', __FILE__, __LINE__, $db->error());
 		$forum_is_subforum = $db->result($result);
 		
-		if ($forum_is_subforum != '0')
+		if ($forum_is_subforum != '0' && $self_subforum == '0')
 			return true;
 		else
 			return false;
@@ -1424,7 +1421,7 @@ function error($message, $file = null, $line = null, $db_error = false) {
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<?php $page_title = array(luna_htmlspecialchars($luna_config['o_board_title']), 'Error') ?>
-		<title><?php echo generate_page_title($page_title) ?></title>
+		<title>Luna error</title>
 		<style type="text/css">
 			body { margin: 10% 20% auto 20%; font: 14px "Segoe UI Light", "Segoe UI", Verdana, Arial, Helvetica, sans-serif; letter-spacing: 1px; }
 			h2 { margin: 0; color: #00a5f5; font-size: 26px; padding: 0 4px; font-weight: 100; }
@@ -1606,12 +1603,20 @@ function forum_list_styles() {
 //
 function forum_list_accents($stage) {
 	global $luna_config;
+	
+	include FORUM_ROOT.'/themes/'.$luna_config['o_default_style'].'/information.php';
+	$theme_info = new SimpleXMLElement($xmlstr);
+
+	if (isset($theme_info->parent_theme))
+		$cur_theme = $theme_info->parent_theme;
+	else
+		$cur_theme = $luna_config['o_default_style'];
 
 	$accents = array();
 
-	if ($stage = 'main' && is_dir(FORUM_ROOT.'themes/'.$luna_config['o_default_style'].'/accents/'))
-		$d = dir(FORUM_ROOT.'themes/'.$luna_config['o_default_style'].'/accents/');
-	if ($stage = 'back')
+	if ($stage == 'main' && is_dir(FORUM_ROOT.'themes/'.$cur_theme.'/accents/'))
+		$d = dir(FORUM_ROOT.'themes/'.$cur_theme.'/accents/');
+	if ($stage == 'back')
 		$d = dir(FORUM_ROOT.'backstage/css/accents/');
 
 	while (($entry = $d->read()) !== false) {
@@ -2084,8 +2089,8 @@ function load_css() {
 		echo '<link rel="stylesheet" type="text/css" href="themes/'.$theme_info->parent_theme.'/style.css" />'."\n";
 		
 		// Also load a color scheme
-		if (file_exists('themes/'.$theme_info->parent_theme.'/accents/'.$luna_user['color_scheme'].'.css')) {
-			if ($luna_user['is_guest'])
+		if ((($luna_config['o_allow_accent_color'] == '1') && file_exists('themes/'.$theme_info->parent_theme.'/accents/'.$luna_user['color_scheme'].'.css')) || (($luna_config['o_allow_accent_color'] == '0') && file_exists('themes/'.$theme_info->parent_theme.'/accents/'.$luna_config['o_default_accent'].'.css'))) {
+			if ($luna_user['is_guest'] || $luna_config['o_allow_accent_color'] == '0')
 				echo '<link rel="stylesheet" type="text/css" href="themes/'.$theme_info->parent_theme.'/accents/'.$luna_config['o_default_accent'].'.css" />'."\n";
 			else
 				echo '<link rel="stylesheet" type="text/css" href="themes/'.$theme_info->parent_theme.'/accents/'.$luna_user['color_scheme'].'.css" />'."\n";
@@ -2096,8 +2101,8 @@ function load_css() {
 	echo '<link rel="stylesheet" type="text/css" href="themes/'.$luna_config['o_default_style'].'/style.css" />'."\n";
 
 	// And load its color scheme
-	if (file_exists('themes/'.$luna_config['o_default_style'].'/accents/'.$luna_user['color_scheme'].'.css')) {
-		if ($luna_user['is_guest'])
+	if ((($luna_config['o_allow_accent_color'] == '1') && file_exists('themes/'.$luna_config['o_default_style'].'/accents/'.$luna_user['color_scheme'].'.css')) || (($luna_config['o_allow_accent_color'] == '0') && file_exists('themes/'.$luna_config['o_default_style'].'/accents/'.$luna_config['o_default_accent'].'.css'))) {
+		if ($luna_user['is_guest'] || $luna_config['o_allow_accent_color'] == '0')
 			echo '<link rel="stylesheet" type="text/css" href="themes/'.$luna_config['o_default_style'].'/accents/'.$luna_config['o_default_accent'].'.css" />'."\n";
 		else
 			echo '<link rel="stylesheet" type="text/css" href="themes/'.$luna_config['o_default_style'].'/accents/'.$luna_user['color_scheme'].'.css" />'."\n";
@@ -2135,15 +2140,18 @@ function load_meta() {
 //
 // Check wheter or not to enable night mode
 //
-function check_night_mode() {
-	global $luna_user, $body_classes;
+function check_style_mode() {
+	global $luna_user, $body_classes, $luna_config;
 
 	$hour = date('G', time());
 	
-	if ($luna_user['adapt_time'] == 1 || (($luna_user['adapt_time'] == 2) && (($hour <= 7) || ($hour >= 19))))
+	if (($luna_user['adapt_time'] == 1 || (($luna_user['adapt_time'] == 2) && (($hour <= 7) || ($hour >= 19)))) && $luna_config['o_allow_night_mode'] == '1')
 		$body_classes .= ' night';
 	else
 		$body_classes .= ' normal';
+	
+	if ($luna_user['enforce_accent'] == 1)
+		$body_classes .= ' enforce';
 
 	return $body_classes;
 }
@@ -2241,7 +2249,7 @@ function get_forum_id($post_id) {
 function decrease_post_counts($post_ids) {
 	global $db;
 
-	// Count the post counts for each user to be subtracted
+	// Count the comment counts for each user to be subtracted
 	$user_posts = array();
 	$result = $db->query('SELECT poster_id FROM '.$db->prefix.'posts WHERE id IN('.$post_ids.') AND poster_id>1') or error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
 	while ($row = $db->fetch_assoc($result))
@@ -2252,7 +2260,19 @@ function decrease_post_counts($post_ids) {
 			++$user_posts[$row['poster_id']];
 	}
 
-	// Decrease the post counts
+	// Decrease the comment counts
 	foreach($user_posts as $user_id => $subtract)
 		$db->query('UPDATE '.$db->prefix.'users SET num_posts = CASE WHEN num_posts>='.$subtract.' THEN num_posts-'.$subtract.' ELSE 0 END WHERE id='.$user_id) or error('Unable to update user post count', __FILE__, __LINE__, $db->error());
+}
+
+// Create or delete configuration items
+function build_config($status, $config_key, $config_valua = NULL) {
+	global $luna_config;
+
+	if ($status == 1)
+		if (!array_key_exists($config_key, $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config ('.$config_key.', conf_value) VALUES (\''.$config_key.'\', \''.$config_valua.'\')') or error('Unable to insert config value \''.$config_key.'\'', __FILE__, __LINE__, $db->error());
+	else
+		if (array_key_exists($config_key, $luna_config))
+			$db->query('DELETE FROM '.$db->prefix.'config WHERE conf_name = \''.$config_key.'\'') or error('Unable to remove config value \''.$config_key.'\'', __FILE__, __LINE__, $db->error());
 }

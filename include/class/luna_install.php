@@ -1300,6 +1300,11 @@ class Installer {
 					'datatype'		=> 'INT(25)',
 					'allow_null'	=> false,
 					'default'		=> '2'
+				),
+				'enforce_accent'	=> array(
+					'datatype'		=> 'TINYINT(1)',
+					'allow_null'	=> false,
+					'default'		=> '0'
 				)
 			),
 			'PRIMARY KEY'	=> array('id'),
@@ -1411,7 +1416,7 @@ class Installer {
 		$luna_config = array(
 			'o_cur_version'				=> Version::FORUM_VERSION,
 			'o_core_version'			=> Version::FORUM_CORE_VERSION,
-			'o_code_name'				=> Version::FORUM_CODE_NAME,
+			'o_code_name'				=> Version::LUNA_CODE_NAME,
 			'o_database_revision'		=> Version::FORUM_DB_VERSION,
 			'o_searchindex_revision'	=> Version::FORUM_SI_VERSION,
 			'o_parser_revision'			=> Version::FORUM_PARSER_VERSION,
@@ -1431,6 +1436,8 @@ class Installer {
 			'o_default_lang'			=> $default_lang,
 			'o_default_style'			=> $default_style,
 			'o_default_accent'			=> 2,
+			'o_allow_accent_color'		=> 1,
+			'o_allow_night_mode'		=> 1,
 			'o_default_user_group'		=> 4,
 			'o_topic_review'			=> 15,
 			'o_disp_topics_default'		=> 30,
@@ -1449,9 +1456,9 @@ class Installer {
 			'o_mailing_list'			=> $email,
 			'o_avatars'					=> $avatars,
 			'o_avatars_dir'				=> 'img/avatars',
-			'o_avatars_width'			=> 100,
-			'o_avatars_height'			=> 100,
-			'o_avatars_size'			=> 20480,
+			'o_avatars_width'			=> 128,
+			'o_avatars_height'			=> 128,
+			'o_avatars_size'			=> 30720,
 			'o_search_all_forums'		=> 1,
 			'o_base_url'				=> $base_url,
 			'o_admin_email'				=> $email,

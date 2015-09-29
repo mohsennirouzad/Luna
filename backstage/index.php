@@ -87,7 +87,7 @@ require 'header.php';
 if (isset($_GET['saved']))
 	echo '<div class="alert alert-success"><h4>'.__('Your settings have been saved.', 'luna').'</h4></div>';
 
-if(is_writable(FORUM_ROOT.'config.php')): ?>
+if(substr(sprintf('%o', fileperms(FORUM_ROOT.'config.php')), -4) > '644'): ?>
 <div class="alert alert-warning"><?php _e('The config file is writeable at this moment, you might want to set the CHMOD to 640 or 644.', 'luna') ?></div>
 <?php endif;
 
@@ -96,12 +96,6 @@ if ($install_file_exists) : ?>
 	<p><?php _e('The file install.php still exists, but should be removed.', 'luna') ?> <span class="pull-right"><a href="index.php?action=remove_install_file"><?php _e('Delete it', 'luna') ?></a></span></p>
 </div>
 <?php endif;
-
-if (($luna_config['o_update_ring'] == '0') && $supported == 'none') { ?>
-<div class="alert alert-danger">
-	<p><?php _e('End of life warning', 'luna') ?></p>
-</div>
-<?php }
 
 if ($luna_config['o_first_run_backstage'] == 0) { ?>
 <div class="panel panel-primary hidden-xs">
@@ -163,7 +157,7 @@ if ($db->num_rows($result)) {
 		$forum = ($cur_report['forum_name'] != '') ? '<span><a href="../viewforum.php?id='.$cur_report['forum_id'].'">'.luna_htmlspecialchars($cur_report['forum_name']).'</a></span>' : '<span>'.__('Deleted', 'luna').'</span>';
 		$topic = ($cur_report['subject'] != '') ? '<span> <span class="divider">/</span> <a href="../viewtopic.php?id='.$cur_report['topic_id'].'">'.luna_htmlspecialchars($cur_report['subject']).'</a></span>' : '<span>»&#160;'.__('Deleted', 'luna').'</span>';
 		$post = str_replace("\n", '<br />', luna_htmlspecialchars($cur_report['message']));
-		$post_id = ($cur_report['pid'] != '') ? '<span><a href="viewtopic.php?pid='.$cur_report['pid'].'#p'.$cur_report['pid'].'">'.sprintf(__('Post #%s', 'luna'), $cur_report['pid']).'</a></span>' : '<span>'.__('Deleted', 'luna').'</span>';
+		$post_id = ($cur_report['pid'] != '') ? '<span><a href="viewtopic.php?pid='.$cur_report['pid'].'#p'.$cur_report['pid'].'">'.sprintf(__('Comment #%s', 'luna'), $cur_report['pid']).'</a></span>' : '<span>'.__('Deleted', 'luna').'</span>';
 		$report_location = array($forum, $topic, $post_id);
 
 ?>

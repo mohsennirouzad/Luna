@@ -4,6 +4,13 @@
 if (!defined('FORUM'))
 	exit;
 
+$sections = array( 'profile', 'personalize', 'email', 'contact', 'threads', 'time', 'admin' );
+if ( isset( $_GET['section'] ) && in_array( $_GET['section'], $sections ) ) {
+	$section = luna_htmlspecialchars( $_GET['section'] );
+} else {
+	$section = 'profile';
+}
+
 ?>
 <div class="col-sm-3 profile-nav">
 	<div class="user-card-profile">
@@ -37,19 +44,19 @@ if (!defined('FORUM'))
 		</div>
 	</nav>
 	<div role="tabpanel">
-		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation" class="active"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab"><span class="fa fa-fw fa-user"></span><span class="hidden-xs"> <?php _e('Profile', 'luna') ?></span></a></li>
-			<li role="presentation"><a href="#personalize" aria-controls="personalize" role="tab" data-toggle="tab"><span class="fa fa-fw fa-paint-brush"></span><span class="hidden-xs"> <?php _e('Personalize', 'luna') ?></span></a></li>
-			<li role="presentation"><a href="#email" aria-controls="email" role="tab" data-toggle="tab"><span class="fa fa-fw fa-envelope-o"></span><span class="hidden-xs"> <?php _e('Message', 'luna') ?></span></a></li>
-			<li role="presentation"><a href="#contact" aria-controls="contact" role="tab" data-toggle="tab"><span class="fa fa-fw fa-share-alt"></span><span class="hidden-xs"> <?php _e('Contact', 'luna') ?></span></a></li>
-			<li role="presentation"><a href="#threads" aria-controls="threads" role="tab" data-toggle="tab"><span class="fa fa-fw fa-list"></span><span class="hidden-xs"> <?php _e('Threads', 'luna') ?></span></a></li>
-			<li role="presentation"><a href="#time" aria-controls="time" role="tab" data-toggle="tab"><span class="fa fa-fw fa-clock-o"></span><span class="hidden-xs"> <?php _e('Time', 'luna') ?></span></a></li>
+		<ul id="profilenav" class="nav nav-tabs" role="tablist">
+			<li role="presentation"<?php if ( 'profile' === $section ) { ?> class="active"<?php } ?>><a href="settings.php?id=<?php echo $id ?>&amp;section=profile#profile" aria-controls="profile" role="tab" data-toggle="tab"><span class="fa fa-fw fa-user"></span><span class="hidden-xs"> <?php _e('Profile', 'luna') ?></span></a></li>
+			<li role="presentation"<?php if ( 'personalize' === $section ) { ?> class="active"<?php } ?>><a href="settings.php?id=<?php echo $id ?>&amp;section=personalize#personalize" aria-controls="personalize" role="tab" data-toggle="tab"><span class="fa fa-fw fa-paint-brush"></span><span class="hidden-xs"> <?php _e('Personalize', 'luna') ?></span></a></li>
+			<li role="presentation"<?php if ( 'email' === $section ) { ?> class="active"<?php } ?>><a href="settings.php?id=<?php echo $id ?>&amp;section=email#email" aria-controls="email" role="tab" data-toggle="tab"><span class="fa fa-fw fa-envelope-o"></span><span class="hidden-xs"> <?php _e('Message', 'luna') ?></span></a></li>
+			<li role="presentation"<?php if ( 'contact' === $section ) { ?> class="active"<?php } ?>><a href="settings.php?id=<?php echo $id ?>&amp;section=contact#contact" aria-controls="contact" role="tab" data-toggle="tab"><span class="fa fa-fw fa-share-alt"></span><span class="hidden-xs"> <?php _e('Contact', 'luna') ?></span></a></li>
+			<li role="presentation"<?php if ( 'threads' === $section ) { ?> class="active"<?php } ?>><a href="settings.php?id=<?php echo $id ?>&amp;section=threads#threads" aria-controls="threads" role="tab" data-toggle="tab"><span class="fa fa-fw fa-list"></span><span class="hidden-xs"> <?php _e('Threads', 'luna') ?></span></a></li>
+			<li role="presentation"<?php if ( 'time' === $section ) { ?> class="active"<?php } ?>><a href="settings.php?id=<?php echo $id ?>&amp;section=time#time" aria-controls="time" role="tab" data-toggle="tab"><span class="fa fa-fw fa-clock-o"></span><span class="hidden-xs"> <?php _e('Time', 'luna') ?></span></a></li>
 			<?php if ($luna_user['g_id'] == FORUM_ADMIN || ($luna_user['g_moderator'] == '1' && $luna_user['g_mod_ban_users'] == '1')): ?>
-				<li role="presentation"><a href="#admin" aria-controls="admin" role="tab" data-toggle="tab"><span class="fa fa-fw fa-dashboard"></span><span class="hidden-xs"> <?php _e('Admin', 'luna') ?></span></a></li>
+				<li role="presentation"<?php if ( 'admin' === $section ) { ?> class="active"<?php } ?>><a href="settings.php?id=<?php echo $id ?>&amp;section=admin#admin" aria-controls="admin" role="tab" data-toggle="tab"><span class="fa fa-fw fa-dashboard"></span><span class="hidden-xs"> <?php _e('Admin', 'luna') ?></span></a></li>
 			<?php endif; ?>
 		</ul>
 		<div class="tab-content">
-			<div role="tabpanel" class="tab-pane active" id="profile">
+			<div role="tabpanel" class="tab-pane<?php if ( 'profile' === $section ) { ?> active<?php } ?>" id="profile">
 				<fieldset class="form-horizontal form-setting">
 					<input type="hidden" name="form_sent" value="1" />
 					<div class="form-group">
@@ -106,7 +113,7 @@ if (!defined('FORUM'))
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?php _e('Signature', 'luna') ?><span class="help-block"><?php _e('Write a small piece to attach to every post you make', 'luna') ?></span></label>
+						<label class="col-sm-3 control-label"><?php _e('Signature', 'luna') ?><span class="help-block"><?php _e('Write a small piece to attach to every comment you make', 'luna') ?></span></label>
 						<div class="col-sm-9">
 							<textarea class="form-control" name="signature" rows="4"><?php echo luna_htmlspecialchars($user['signature']) ?></textarea>
 							<span class="help-block"><?php printf(__('Max length: %s characters / Max lines: %s', 'luna'), forum_number_format($luna_config['p_sig_length']), $luna_config['p_sig_lines']) ?></span>
@@ -122,9 +129,9 @@ if (!defined('FORUM'))
 					</div>
 				</fieldset>
 			</div>
-			<div role="tabpanel" class="tab-pane" id="personalize">
+			<div role="tabpanel" class="tab-pane<?php if ( 'personalize' === $section ) { ?> active<?php } ?>" id="personalize">
 				<fieldset class="form-horizontal form-setting">
-					<div class="form-group">
+					<div class="form-group<?php if ($luna_config['o_allow_accent_color'] == '0') { echo ' hidden-xs hidden-sm hidden-md hidden-lg'; } ?>">
 						<label class="col-sm-3 control-label"><?php _e('Color', 'luna') ?></label>
 						<div class="col-sm-9">
 							<div class="btn-group accent-group" data-toggle="buttons">
@@ -139,34 +146,40 @@ if (!defined('FORUM'))
 		}
 ?>
 							</div>
+							<div class="checkbox">
+								<label>
+									<input type="checkbox" name="form[enforce_accent]" value="1"<?php if ($user['enforce_accent'] == '1') echo ' checked' ?> />
+									<?php _e('Enforce the accent on the board.', 'luna') ?>
+								</label>
+							</div>
 						</div>
+						<hr />
 					</div>
-					<div class="form-group">
-						<label class="col-sm-3 control-label">Night mode</label>
+					<div class="form-group<?php if ($luna_config['o_allow_night_mode'] == '0') { echo ' hidden-xs hidden-sm hidden-md hidden-lg'; } ?>">
+						<label class="col-sm-3 control-label"><?php _e('Night mode', 'luna') ?></label>
 						<div class="col-sm-9">
 							<div class="radio">
 								<label>
 									<input type="radio" name="form[adapt_time]" value="0"<?php if ($user['adapt_time'] == '0') echo ' checked' ?> />
-									Never use night mode
+									<?php _e('Never use night mode.', 'luna') ?>
 								</label>
 							</div>
 							<div class="radio">
 								<label>
 									<input type="radio" name="form[adapt_time]" value="1"<?php if ($user['adapt_time'] == '1') echo ' checked' ?> />
-									Always use night mode
+									<?php _e('Always use night mode.', 'luna') ?>
 								</label>
 							</div>
 							<div class="radio">
 								<label>
 									<input type="radio" name="form[adapt_time]" value="2"<?php if ($user['adapt_time'] == '2') echo ' checked' ?> />
-									Enable night mode automatically
+									<?php _e('Enable night mode automatically.', 'luna') ?>
 								</label>
 							</div>
 						</div>
 					</div>
-<?php if ($luna_user['is_admmod']) { ?>
 					<hr />
-					<div class="form-group">
+					<div class="form-group <?php if (!$luna_user['is_admmod']) { echo ' hidden-xs hidden-sm hidden-md hidden-lg'; } ?>">
 						<label class="col-sm-3 control-label"><?php _e('Backstage accent', 'luna') ?></label>
 						<div class="col-sm-9">
 							<div class="btn-group accent-group" data-toggle="buttons">
@@ -182,16 +195,15 @@ if (!defined('FORUM'))
 ?>
 							</div>
 						</div>
+						<hr />
 					</div>
 <?php
-}
 
 $languages = forum_list_langs();
 
 // Only display the language selection box if there's more than one language available
 if (count($languages) > 1) {
 ?>
-					<hr />
 					<div class="form-group">
 						<label class="col-sm-3 control-label"><?php _e('Language', 'luna') ?></label>
 						<div class="col-sm-9">
@@ -210,7 +222,7 @@ if (count($languages) > 1) {
 <?php } ?>
 				</fieldset>
 			</div>
-			<div role="tabpanel" class="tab-pane" id="email">
+			<div role="tabpanel" class="tab-pane<?php if ( 'email' === $section ) { ?> active<?php } ?>" id="email">
 				<fieldset class="form-horizontal form-setting">
 					<?php if ($luna_config['o_pms_enabled'] == 1) { ?>
 					<div class="form-group">
@@ -256,74 +268,69 @@ if (count($languages) > 1) {
 							<div class="checkbox">
 								<label>
 									<input type="checkbox" name="form[notify_with_post]" value="1"<?php if ($user['notify_with_post'] == '1') echo ' checked' ?> />
-									<?php _e('Include a plain text version of new posts in subscription notification emails.', 'luna') ?>
+									<?php _e('Include a plain text version of new comments in subscription notification emails.', 'luna') ?>
 								</label>
 							</div>
 							<div class="checkbox">
 								<label>
 									<input type="checkbox" name="form[auto_notify]" value="1"<?php if ($user['auto_notify'] == '1') echo ' checked' ?> />
-									<?php _e('Automatically subscribe to every topic you post in.', 'luna') ?>
+									<?php _e('Automatically subscribe to every thread you comment in.', 'luna') ?>
 								</label>
 							</div>
 						</div>
 					</div>
 				</fieldset>
 			</div>
-			<div role="tabpanel" class="tab-pane" id="contact">
+			<div role="tabpanel" class="tab-pane<?php if ( 'contact' === $section ) { ?> active<?php } ?>" id="contact">
 				<fieldset class="form-horizontal form-setting">
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?php _e('Website', 'luna') ?></label>
-						<div class="col-sm-9">
+						<div class="col-sm-12">
 							<div class="input-group input">
-								<span class="input-group-addon" id="website-addon"><span class="fa fa-fw fa-link"></span></span>
+								<span class="input-group-addon" id="website-addon"><span class="fa fa-fw fa-link"></span> <?php _e('Website', 'luna') ?></span>
 								<input id="website" type="text" class="form-control" name="form[url]" value="<?php echo luna_htmlspecialchars($user['url']) ?>" maxlength="80" aria-describedby="website-addon">
 							</div>
 						</div>
 					</div>
 					<hr />
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?php _e('Microsoft Account', 'luna') ?></label>
-						<div class="col-sm-9">
+						<div class="col-sm-12">
 							<div class="input-group input">
-								<span class="input-group-addon" id="microsoft-addon"><span class="fa fa-fw fa-windows"></span></span>
+								<span class="input-group-addon" id="microsoft-addon"><span class="fa fa-fw fa-windows"></span> <?php _e('Microsoft Account', 'luna') ?></span>
 								<input id="microsoft" type="text" class="form-control" name="form[msn]" value="<?php echo luna_htmlspecialchars($user['msn']) ?>" maxlength="50" aria-describedby="microsoft-addon">
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?php _e('Facebook', 'luna') ?></label>
-						<div class="col-sm-9">
+						<div class="col-sm-12">
 							<div class="input-group">
-								<span class="input-group-addon" id="facebook-addon"><span class="fa fa-fw fa-facebook-square"></span></span>
+								<span class="input-group-addon" id="facebook-addon"><span class="fa fa-fw fa-facebook-square"></span> <?php _e('Facebook', 'luna') ?></span>
 								<input id="facebook" type="text" class="form-control" name="form[facebook]" value="<?php echo luna_htmlspecialchars($user['facebook']) ?>" maxlength="50" aria-describedby="facebook-addon">
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?php _e('Twitter', 'luna') ?></label>
-						<div class="col-sm-9">
+						<div class="col-sm-12">
 							<div class="input-group">
-								<span class="input-group-addon" id="twitter-addon"><span class="fa fa-fw fa-twitter"></span></span>
+								<span class="input-group-addon" id="twitter-addon"><span class="fa fa-fw fa-twitter"></span> <?php _e('Twitter', 'luna') ?></span>
 								<input id="twitter" type="text" class="form-control" name="form[twitter]" value="<?php echo luna_htmlspecialchars($user['twitter']) ?>" maxlength="50" aria-describedby="twitter-addon">
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?php _e('Google+', 'luna') ?></label>
-						<div class="col-sm-9">
+						<div class="col-sm-12">
 							<div class="input-group">
-								<span class="input-group-addon" id="google-addon"><span class="fa fa-fw fa-google-plus"></span></span>
+								<span class="input-group-addon" id="google-addon"><span class="fa fa-fw fa-google-plus"></span> <?php _e('Google+', 'luna') ?></span>
 								<input id="google" type="text" class="form-control" name="form[google]" value="<?php echo luna_htmlspecialchars($user['google']) ?>" maxlength="50" aria-describedby="google-addon">
 							</div>
 						</div>
 					</div>
 				</fieldset>
 			</div>
-			<div role="tabpanel" class="tab-pane" id="threads">
+			<div role="tabpanel" class="tab-pane<?php if ( 'threads' === $section ) { ?> active<?php } ?>" id="threads">
 				<fieldset class="form-horizontal form-setting">
 					<?php if ($luna_config['o_smilies_sig'] == '1' || $luna_config['o_signatures'] == '1' || $luna_config['o_avatars'] == '1' || $luna_config['p_message_img_tag'] == '1'): ?>
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?php _e('Post display', 'luna') ?></label>
+							<label class="col-sm-3 control-label"><?php _e('Comment display', 'luna') ?></label>
 							<div class="col-sm-9">
 								<?php if ($luna_config['o_smilies_sig'] == '1'): ?>
 									<div class="checkbox">
@@ -343,14 +350,14 @@ if (count($languages) > 1) {
 									<div class="checkbox">
 										<label>
 											<input type="checkbox" name="form[show_avatars]" value="1"<?php if ($user['show_avatars'] == '1') echo ' checked' ?> />
-											<?php _e('Show user avatars in posts.', 'luna') ?>
+											<?php _e('Show user avatars in comments.', 'luna') ?>
 										</label>
 									</div>
 								<?php endif; if ($luna_config['p_message_img_tag'] == '1'): ?>
 									<div class="checkbox">
 										<label>
 											<input type="checkbox" name="form[show_img]" value="1"<?php if ($user['show_img'] == '1') echo ' checked' ?> />
-											<?php _e('Show images in posts.', 'luna') ?>
+											<?php _e('Show images in comments.', 'luna') ?>
 										</label>
 									</div>
 								<?php endif; if ($luna_config['o_signatures'] == '1' && $luna_config['p_sig_img_tag'] == '1'): ?>
@@ -366,20 +373,20 @@ if (count($languages) > 1) {
 					<?php endif; ?>
 					<hr />
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?php _e('Topics per page', 'luna') ?></label>
+						<label class="col-sm-3 control-label"><?php _e('Threads per page', 'luna') ?></label>
 						<div class="col-sm-9">
 							<input type="text" class="form-control" name="form[disp_topics]" value="<?php echo $user['disp_topics'] ?>" maxlength="3" />
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-3 control-label"><?php _e('Posts per page', 'luna') ?></label>
+						<label class="col-sm-3 control-label"><?php _e('Comments per page', 'luna') ?></label>
 						<div class="col-sm-9">
 							<input type="text" class="form-control" name="form[disp_posts]" value="<?php echo $user['disp_posts'] ?>" maxlength="3" />
 						</div>
 					</div>
 				</fieldset>
 			</div>
-			<div role="tabpanel" class="tab-pane" id="time">
+			<div role="tabpanel" class="tab-pane<?php if ( 'time' === $section ) { ?> active<?php } ?>" id="time">
 				<fieldset class="form-horizontal form-setting">
 					<div class="form-group">
 						<label class="col-sm-3 control-label"><?php _e('Time zone', 'luna') ?></label>
@@ -473,7 +480,7 @@ if (count($languages) > 1) {
 				</fieldset>
 			</div>
 			<?php if ($luna_user['g_id'] == FORUM_ADMIN || ($luna_user['g_moderator'] == '1' && $luna_user['g_mod_ban_users'] == '1')): ?>
-			<div role="tabpanel" class="tab-pane" id="admin">
+			<div role="tabpanel" class="tab-pane<?php if ( 'admin' === $section ) { ?> active<?php } ?>" id="admin">
 				<fieldset class="form-horizontal form-setting">
 					<?php if ($luna_user['g_moderator'] == '1') { ?>
 						<div class="form-group">
@@ -548,7 +555,7 @@ if (count($languages) > 1) {
 					<?php } ?>
 					<?php if ($luna_user['g_id'] == FORUM_ADMIN): ?>
 						<div class="form-group">
-							<label class="col-sm-3 control-label"><?php _e('Posts', 'luna') ?></label>
+							<label class="col-sm-3 control-label"><?php _e('Comments', 'luna') ?></label>
 							<div class="col-sm-9">
 								<input type="text" class="form-control" name="num_posts" value="<?php echo $user['num_posts'] ?>" maxlength="8" />
 							</div>
