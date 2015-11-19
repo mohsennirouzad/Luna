@@ -7,8 +7,8 @@
  * Licensed under GPLv3 (http://getluna.org/license.php)
  */
 
-define('FORUM_ROOT', '../');
-require FORUM_ROOT.'include/common.php';
+define('LUNA_ROOT', '../');
+require LUNA_ROOT.'include/common.php';
 
 if (!$is_admin)
 	header("Location: login.php");
@@ -20,8 +20,8 @@ if (isset($_POST['form_sent'])) {
 		'censoring'						=> isset($_POST['form']['censoring']) ? '1' : '0',
 		'signatures'					=> isset($_POST['form']['signatures']) ? '1' : '0',
 		'ranks'							=> isset($_POST['form']['ranks']) ? '1' : '0',
-		'topic_views'					=> isset($_POST['form']['topic_views']) ? '1' : '0',
-		'has_posted'					=> isset($_POST['form']['has_posted']) ? '1' : '0',
+		'thread_views'					=> isset($_POST['form']['thread_views']) ? '1' : '0',
+		'has_commented'					=> isset($_POST['form']['has_commented']) ? '1' : '0',
 		'show_first_run'				=> isset($_POST['form']['show_first_run']) ? '1' : '0',
 		'first_run_guests'				=> isset($_POST['form']['first_run_guests']) ? '1' : '0',
 		'first_run_message'				=> luna_trim($_POST['form']['first_run_message']),
@@ -34,9 +34,9 @@ if (isset($_POST['form_sent'])) {
 		'gzip'							=> isset($_POST['form']['gzip']) ? '1' : '0',
 		'search_all_forums'				=> isset($_POST['form']['search_all_forums']) ? '1' : '0',
 		'enable_advanced_search'		=> isset($_POST['form']['enable_advanced_search']) ? '1' : '0',
-		'pms_enabled'					=> isset($_POST['form']['pms_enabled']) ? '1' : '0',
-		'pms_notification'				=> isset($_POST['form']['pms_notification']) ? '1' : '0',
-		'pms_max_receiver'				=> (intval($_POST['form']['pms_max_receiver']) > 0) ? intval($_POST['form']['pms_max_receiver']) : 5
+		'inbox_enabled'					=> isset($_POST['form']['inbox_enabled']) ? '1' : '0',
+		'inbox_notification'				=> isset($_POST['form']['inbox_notification']) ? '1' : '0',
+		'inbox_max_receiver'				=> (intval($_POST['form']['inbox_max_receiver']) > 0) ? intval($_POST['form']['inbox_max_receiver']) : 5
 	);
 
 	foreach ($form as $key => $input) {
@@ -52,8 +52,8 @@ if (isset($_POST['form_sent'])) {
 	}
 
 	// Regenerate the config cache
-	if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
-		require FORUM_ROOT.'include/cache.php';
+	if (!defined('LUNA_CACHE_FUNCTIONS_LOADED'))
+		require LUNA_ROOT.'include/cache.php';
 
 	generate_config_cache();
 	clear_feed_cache();
@@ -62,12 +62,12 @@ if (isset($_POST['form_sent'])) {
 }
 
 $page_title = array(luna_htmlspecialchars($luna_config['o_board_title']), __('Admin', 'luna'), __('Features', 'luna'));
-define('FORUM_ACTIVE_PAGE', 'admin');
+define('LUNA_ACTIVE_PAGE', 'admin');
 require 'header.php';
 load_admin_nav('settings', 'features');
 
 if (isset($_GET['saved']))
-	echo '<div class="alert alert-success"><h4>'.__('Your settings have been saved.', 'luna').'</h4></div>'
+	echo '<div class="alert alert-success">'.__('Your settings have been saved.', 'luna').'</div>'
 ?>
 <form class="form-horizontal" method="post" action="features.php">
 	<div class="panel panel-default">
@@ -88,13 +88,13 @@ if (isset($_GET['saved']))
 						</div>   
 						<div class="checkbox">
 							<label>
-								<input type="checkbox" name="form[topic_views]" value="1" <?php if ($luna_config['o_topic_views'] == '1') echo ' checked' ?> />
+								<input type="checkbox" name="form[thread_views]" value="1" <?php if ($luna_config['o_thread_views'] == '1') echo ' checked' ?> />
 								<?php _e('Show the number of views for each thread.', 'luna') ?>
 							</label>
 						</div>  
 						<div class="checkbox">
 							<label>
-								<input type="checkbox" name="form[has_posted]" value="1" <?php if ($luna_config['o_has_posted'] == '1') echo ' checked' ?> />
+								<input type="checkbox" name="form[has_commented]" value="1" <?php if ($luna_config['o_has_commented'] == '1') echo ' checked' ?> />
 								<?php _e('Show a label in front of the thread where users have commented.', 'luna') ?>
 							</label>
 						</div>					
@@ -155,7 +155,7 @@ if (isset($_GET['saved']))
 					<div class="col-sm-9">
 						<div class="checkbox">
 							<label>
-								<input type="checkbox" name="form[pms_enabled]" value="1" <?php if ($luna_config['o_pms_enabled'] == '1') echo ' checked' ?> />
+								<input type="checkbox" name="form[inbox_enabled]" value="1" <?php if ($luna_config['o_enable_inbox'] == '1') echo ' checked' ?> />
 								<?php _e('Allow users to use Inbox.', 'luna') ?>
 							</label>
 						</div>
@@ -164,7 +164,7 @@ if (isset($_GET['saved']))
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?php _e('Receivers', 'luna') ?><span class="help-block"><?php _e('The number of receivers an Inbox message can have.', 'luna') ?></span></label>
 					<div class="col-sm-9">
-						<input type="text" class="form-control" name="form[pms_max_receiver]" maxlength="5" value="<?php echo $luna_config['o_pms_max_receiver'] ?>" />
+						<input type="number" class="form-control" name="form[inbox_max_receiver]" maxlength="5" value="<?php echo $luna_config['o_max_receivers'] ?>" />
 					</div>
 				</div>
 			</fieldset>
@@ -230,26 +230,26 @@ if (isset($_GET['saved']))
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?php _e('Indent size', 'luna') ?><span class="help-block"><?php _e('Amount of spaces that represent a tab', 'luna') ?></span></label>
 					<div class="col-sm-9">
-						<input type="text" class="form-control" name="form[indent_num_spaces]" maxlength="3" value="<?php echo $luna_config['o_indent_num_spaces'] ?>" />
+						<input type="number" class="form-control" name="form[indent_num_spaces]" maxlength="3" value="<?php echo $luna_config['o_indent_num_spaces'] ?>" />
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?php _e('Maximum [quote] depth', 'luna') ?><span class="help-block"><?php _e('Maximum [quote] can be used in [quote]', 'luna') ?></span></label>
 					<div class="col-sm-9">
-						<input type="text" class="form-control" name="form[quote_depth]" maxlength="3" value="<?php echo $luna_config['o_quote_depth'] ?>" />
+						<input type="number" class="form-control" name="form[quote_depth]" maxlength="3" value="<?php echo $luna_config['o_quote_depth'] ?>" />
 					</div>
 				</div>
 				<hr />
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?php _e('Video height', 'luna') ?><span class="help-block"><?php _e('Height of an embedded video', 'luna') ?></span></label>
 					<div class="col-sm-9">
-						<input type="text" class="form-control" name="form[video_width]" maxlength="4" value="<?php echo $luna_config['o_video_width'] ?>" />
+						<input type="number" class="form-control" name="form[video_width]" maxlength="4" value="<?php echo $luna_config['o_video_width'] ?>" />
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?php _e('Video width', 'luna') ?><span class="help-block"><?php _e('Width of an embedded video', 'luna') ?></span></label>
 					<div class="col-sm-9">
-						<input type="text" class="form-control" name="form[video_height]" maxlength="4" value="<?php echo $luna_config['o_video_height'] ?>" />
+						<input type="number" class="form-control" name="form[video_height]" maxlength="4" value="<?php echo $luna_config['o_video_height'] ?>" />
 					</div>
 				</div>
 			</fieldset>

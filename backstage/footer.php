@@ -12,7 +12,7 @@ if (!defined('FORUM'))
 	exit;
 
 // Display debug info (if enabled/defined)
-if (defined('FORUM_DEBUG')) {
+if (defined('LUNA_DEBUG')) {
 	echo '<p id="debug">[ ';
 
 	// Calculate script generation time
@@ -57,6 +57,37 @@ $db->end_transaction();
 					show_field: true,
 					palette_size: 42,
 					palette_row_count: 5,
+				});
+				
+				// Make it possible to click anywhere within a row to select the checkbox
+				$('.table tr').click(function(event) {
+					if (event.target.type !== 'checkbox') {
+						$(':checkbox', this).trigger('click');
+					}
+				});
+				
+				// Highlight checked rows
+				$("input[type='checkbox']").change(function (e) {
+					if ($(this).is(":checked")) {
+						$(this).closest('tbody tr').addClass("active"); 
+					} else {
+						$(this).closest('tbody tr').removeClass("active");
+					}
+				});
+
+				// Check all
+				$(".table #checkall").click(function () {
+					if ($(".table #checkall").is(':checked')) {
+						$(".table input[type=checkbox]").each(function () {
+							$(this).prop("checked", true);
+							$(this).closest('tbody tr').addClass("active"); 
+						});
+					} else {
+						$(".table input[type=checkbox]").each(function () {
+							$(this).prop("checked", false);
+							$(this).closest('tbody tr').removeClass("active"); 
+						});
+					}
 				});
 
 			});

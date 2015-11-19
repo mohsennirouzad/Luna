@@ -8,7 +8,7 @@ if ($luna_user['first_run'] == '0') {
 ?>
 <div class="first-run panel panel-default">
 	<div class="row first-run-content">
-		<div class="col-md-4 col-sm-6 col-xs-5 first-run-profile">
+		<div class="col-md-4 col-sm-6 hidden-xs first-run-profile">
 			<h3 class="first-run-title"><span class="hidden-xs"><?php echo sprintf(__('Hi there, %s', 'luna'), luna_htmlspecialchars($luna_user['username'])) ?></span><span class="visible-xs-block"><?php echo luna_htmlspecialchars($luna_user['username']) ?></span></h3>
 			<span class="first-run-avatar thumbnail">
 				<?php echo $user_avatar ?>
@@ -19,7 +19,7 @@ if ($luna_user['first_run'] == '0') {
 			<h3 class="first-run-forumtitle"><?php echo sprintf(__('Welcome to %s', 'luna'), $luna_config['o_board_title']) ?></h3>
 			<p><?php echo $luna_config['o_first_run_message']; ?></p>
 		</div>
-		<div class="col-md-4 col-sm-6 col-xs-7">
+		<div class="col-md-4 col-sm-6 col-xs-12">
 			<div class="list-group first-run-list">
 				<a href="settings.php" class="list-group-item"><?php _e('Extend your details', 'luna') ?></a>
 				<a href="help.php" class="list-group-item"><?php _e('Get help', 'luna') ?></a>
@@ -36,7 +36,7 @@ if ($luna_user['first_run'] == '0') {
 				<a href="#" data-toggle="modal" data-target="#reqpass" class="list-group-item"><?php _e('Forgotten password', 'luna') ?></a>
 			</div>
 		</div>
-		<div class="col-md-4 col-sm-6 col-xs-7">
+		<div class="col-md-4 col-sm-6 col-xs-12">
 			<form class="form form-first-run" id="login" method="post" action="login.php?action=in" onsubmit="return process_form(this)">
 				<fieldset>
 					<h3><?php _e('Login', 'luna') ?></h3>
@@ -60,11 +60,15 @@ if ($luna_user['first_run'] == '0') {
 <div class="row index">
 	<div class="col-sm-3 col-xs-12">
 		<div class="list-group list-group-forum">
-			<?php draw_forum_list() ?>
+			<?php draw_forum_list('forum.php', 1, 'category.php', ''); ?>
 		</div>
 		<hr />
 		<div class="list-group list-group-forum">
-			<?php draw_mark_read('list-group-item', 'index') ?>
+			<?php echo implode('', $page_threadsearches) ?>
+		</div>
+		<hr />
+		<div class="list-group list-group-forum">
+			<?php draw_mark_read('list-group-item', 'index'); ?>
 		</div>
 	</div>
 	<div class="col-sm-9 col-xs-12">
@@ -82,9 +86,9 @@ if ($luna_user['first_run'] == '0') {
         <div class="alert alert-info alert-section alert-all">
             <h3><?php _e('Recent activity', 'luna') ?></h3>
         </div>
-		<div class="list-group list-group-topic">
+		<div class="list-group list-group-thread">
 <?php
-			draw_index_topics_list();
+			draw_index_threads_list();
 ?>
 		</div>
 	</div>

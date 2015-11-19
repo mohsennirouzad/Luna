@@ -7,14 +7,14 @@
  * Licensed under GPLv3 (http://getluna.org/license.php)
  */
 
-define('FORUM_ROOT', '../');
-require FORUM_ROOT.'include/common.php';
+define('LUNA_ROOT', '../');
+require LUNA_ROOT.'include/common.php';
 
 if (!$luna_user['is_admmod'])
 	header("Location: login.php");
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 $page_title = array(luna_htmlspecialchars($luna_config['o_board_title']), __('Admin', 'luna'), __('Update', 'luna'));
-define('FORUM_ACTIVE_PAGE', 'admin');
+define('LUNA_ACTIVE_PAGE', 'admin');
 require 'header.php';
 	load_admin_nav('backstage', 'about');
 	
@@ -23,23 +23,24 @@ require 'header.php';
 	<div class="col-sm-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title">About Luna 1.2 Cornflower Blue</h3>
+				<h3 class="panel-title">About Luna 1.3 Denim Preview</h3>
 			</div>
 			<div class="panel-body">
 				<section class="release-notes">
 					<div class="container">
-						<p class="meta"><span class="release-version">1.2 Preview 1</span></p><h2>Cornflower Blue Preview 1</h2>
+						<p class="meta"><span class="release-version">1.3 Preview 3</span></p><h2>Denim</h2>
 						<ul class="changes">
-							<li><div class="change-label-container"><em class="change-label change-new">New</em></div>Sixteen is the new default theme</li>
-							<li><div class="change-label-container"><em class="change-label change-new">New</em></div>Mark topics as solved</li>
-							<li><div class="change-label-container"><em class="change-label change-new">New</em></div>You can now set any color as forum colors</li>
-							<li><div class="change-label-container"><em class="change-label change-system">System</em></div>Support for non-Latin characters</li>
-							<li><div class="change-label-container"><em class="change-label change-improved">Improved</em></div>Extended language support for syntax highlighter</li>
-							<li><div class="change-label-container"><em class="change-label change-improved">Improved</em></div>New tools to clean up notifications</li>
-							<li><div class="change-label-container"><em class="change-label change-improved">Improved</em></div>Improvements for non-Javascript usage</li>
-							<li><div class="change-label-container"><em class="change-label change-improved">Improved</em></div>Updated and incorporated components</li>
-							<li><div class="change-label-container"><em class="change-label change-note">Changed</em></div>Default avatar settings have been updated</li>
-							<li><div class="change-label-container"><em class="change-label change-fixed">Fixed</em></div>Fixes 3 bugs</li>
+							<li><div class="change-label-container"><em class="change-label change-new">New</em></div>Sunrise is a new default theme</li>
+							<li><div class="change-label-container"><em class="change-label change-new">New</em></div>You can now mark a thread as important</li>
+							<li><div class="change-label-container"><em class="change-label change-system">System</em></div>Major naming convention updates</li>
+							<li><div class="change-label-container"><em class="change-label change-system">System</em></div>Timezone settings have been reworked</li>
+							<li><div class="change-label-container"><em class="change-label change-improved">Improved</em></div>Daylight Saving is now handled by Luna</li>
+							<li><div class="change-label-container"><em class="change-label change-improved">Improved</em></div>Fifteen now has an updated sidebar</li>
+							<li><div class="change-label-container"><em class="change-label change-improved">Improved</em></div>Improved mobile interface for Fifteen and Backstage</li>
+							<li><div class="change-label-container"><em class="change-label change-improved">Improved</em></div>CSS files have been rewritten</li>
+							<li><div class="change-label-container"><em class="change-label change-fixed">Fixed</em></div>Fixes 4 bugs</li>
+							<hr />
+							<li><div class="change-label-container"><em class="change-label change-system">System</em></div>Support for Luna 2.0 Fallow build 6126</li>
 						</ul>
 					</div>
 				</section>

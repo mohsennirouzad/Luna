@@ -7,8 +7,8 @@
  * Licensed under GPLv3 (http://getluna.org/license.php)
  */
 
-define('FORUM_ROOT', dirname(__FILE__).'/');
-require FORUM_ROOT.'include/common.php';
+define('LUNA_ROOT', dirname(__FILE__).'/');
+require LUNA_ROOT.'include/common.php';
 
 // If we are logged in, we shouldn't be here
 if (!$luna_user['is_guest']) {
@@ -21,7 +21,7 @@ if ($luna_config['o_regs_allow'] == '0')
 
 if ($luna_config['o_rules'] == '1' && !isset($_GET['agree']) && !isset($_POST['form_sent'])) {
 	$page_title = array(luna_htmlspecialchars($luna_config['o_board_title']), __('Register', 'luna'), __('Forum rules', 'luna'));
-	define('FORUM_ACTIVE_PAGE', 'register');
+	define('LUNA_ACTIVE_PAGE', 'register');
 	require load_page('header.php');
 
 	require load_page('rules.php');
@@ -62,7 +62,7 @@ if ($luna_config['o_rules'] == '1' && !isset($_GET['agree']) && !isset($_POST['f
 			$errors[] = __('Passwords do not match.', 'luna');
 	
 		// Validate email
-		require FORUM_ROOT.'include/email.php';
+		require LUNA_ROOT.'include/email.php';
 	
 		if (!is_valid_email($email1))
 			$errors[] = __('The email address you entered is invalid.', 'luna');
@@ -101,17 +101,17 @@ if ($luna_config['o_rules'] == '1' && !isset($_GET['agree']) && !isset($_POST['f
 			// Insert the new user into the database. We do this now to get the last inserted ID for later use
 			$now = time();
 	
-			$intial_group_id = ($luna_config['o_regs_verify'] == '0') ? $luna_config['o_default_user_group'] : FORUM_UNVERIFIED;
+			$intial_group_id = ($luna_config['o_regs_verify'] == '0') ? $luna_config['o_default_user_group'] : LUNA_UNVERIFIED;
 			$password_hash = luna_hash($password1);
 	
 			// Add the user
-			$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, language, style, color_scheme, registered, registration_ip, last_visit, timezone) VALUES(\''.$db->escape($username).'\', '.$intial_group_id.', \''.$password_hash.'\', \''.$db->escape($email1).'\', \''.$luna_config['o_default_lang'].'\', \''.$luna_config['o_default_style'].'\', \''.$luna_config['o_default_accent'].'\', '.$now.', \''.$db->escape(get_remote_address()).'\', '.$now.', '.$luna_config['o_default_timezone'].')') or error('Unable to create user', __FILE__, __LINE__, $db->error());
+			$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, language, style, color_scheme, registered, registration_ip, last_visit, php_timezone) VALUES(\''.$db->escape($username).'\', '.$intial_group_id.', \''.$password_hash.'\', \''.$db->escape($email1).'\', \''.$luna_config['o_default_lang'].'\', \''.$luna_config['o_default_style'].'\', \''.$luna_config['o_default_accent'].'\', '.$now.', \''.$db->escape(get_remote_address()).'\', '.$now.', \''.$luna_config['o_timezone'].'\')') or error('Unable to create user', __FILE__, __LINE__, $db->error());
 			$new_uid = $db->insert_id();
 	
 			if ($luna_config['o_regs_verify'] == '0') {
 				// Regenerate the users info cache
-				if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
-					require FORUM_ROOT.'include/cache.php';
+				if (!defined('LUNA_CACHE_FUNCTIONS_LOADED'))
+					require LUNA_ROOT.'include/cache.php';
 	
 				generate_users_info_cache();
 			}
@@ -243,7 +243,7 @@ Login at <login_url> to activate the account.
 	$page_title = array(luna_htmlspecialchars($luna_config['o_board_title']), __('Register', 'luna'));
 	$required_fields = array('req_user' => __('Username', 'luna'), 'req_password1' => __('Password', 'luna'), 'req_password2' => __('Confirm password', 'luna'), 'req_email1' => __('Email', 'luna'), 'req_email2' => __('Email', 'luna').' 2');
 	$focus_element = array('register', 'req_user');
-	define('FORUM_ACTIVE_PAGE', 'register');
+	define('LUNA_ACTIVE_PAGE', 'register');
 	require load_page('header.php');
 	
 	require load_page('register.php');

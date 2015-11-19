@@ -52,34 +52,34 @@ function get_user_nav_menu_items() {
 			'flyout' => 1 == $luna_config['o_notification_flyout']
 		);
 
-		if ($luna_config['o_pms_enabled'] == '1' && $luna_user['g_pm'] == '1' && $luna_user['use_pm'] == '1') {
+		if ($luna_config['o_enable_inbox'] == '1' && $luna_user['g_inbox'] == '1' && $luna_user['use_inbox'] == '1') {
 			// Check for new messages
 			$result = $db->query('SELECT COUNT(id) FROM '.$db->prefix.'messages WHERE showed=0 AND show_message=1 AND owner='.$luna_user['id']) or error('Unable to check the availibility of new messages', __FILE__, __LINE__, $db->error());
-			$num_new_pm = intval($db->result($result));
+			$num_new_inbox = intval($db->result($result));
 
 			$items['inbox'] = array(
 				'url'   => 'inbox.php',
 				'title' => 'Inbox',
-				'num'   => $num_new_pm,
+				'num'   => $num_new_inbox,
 			);
 		}
 
 		$items['user'] = array(
 			'profile'  => array(
 				'url'   => 'profile.php?id='.$luna_user['id'],
-				'title' => __('Profile', 'luna'),
+				'title' => '<span class="fa fa-fw fa-user"></span> '.__('Profile', 'luna'),
 			),
 			'settings' => array(
 				'url'   => 'settings.php',
-				'title' => __('Settings', 'luna'),
+				'title' => '<span class="fa fa-fw fa-cogs"></span> '.__('Settings', 'luna'),
 			),
 			'help'     => array(
 				'url'   => 'help.php',
-				'title' => __('Help', 'luna'),
+				'title' => '<span class="fa fa-fw fa-info-circle"></span> '.__('Help', 'luna'),
 			),
 			'logout'   => array(
-				'url'   => 'login.php?action=out&amp;id='.$luna_user['id'].'&amp;csrf_token='.luna_hash($luna_user['id'].luna_hash(get_remote_address())),
-				'title' => __('Logout', 'luna'),
+				'url'   => 'login.php?action=out&amp;id='.$luna_user['id'].'&amp;csrf_token='.luna_csrf_token(),
+				'title' =>'<span class="fa fa-fw fa-sign-out"></span> '. __('Logout', 'luna'),
 			)
 		);
 	}

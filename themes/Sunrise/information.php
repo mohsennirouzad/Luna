@@ -7,7 +7,7 @@ $xmlstr = <<<XML
 
 /*
  * Copyright (C) 2014-2015 Studio 384
- * Licensed under MIT
+ * Licensed under GPLv3 (http://getluna.org/license.php)
  */
 -->
 
@@ -15,12 +15,11 @@ $xmlstr = <<<XML
 	<id>sunrise</id>
 	<name>Sunrise</name>
 	<developer>Studio 384</developer>
-	<date>13 September 2015</date>
-	<version>1.2 Preview</version>
-	<minversion>1.2 Preview 1</minversion>
-	<maxversion>1.2 Preview 1</maxversion>
-	<description>Sunset is a variant upon Fifteen, featuring a more classic design.</description>
-	<parent_theme>Fifteen</parent_theme>
+	<date>19 November 2015</date>
+	<version>2.0 Preview</version>
+	<minversion>1.3 Preview 3</minversion>
+	<maxversion>1.3 Preview 4</maxversion>
+	<description>Sunrise is a more classic take on the look and feel of forum software.</description>
 </style>
 XML;
 ?>

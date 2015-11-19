@@ -28,7 +28,7 @@ if(!empty($items['inbox'])) {
 if (!empty($items['guest'])) {
 	$item = $items['guest'];
 ?>
-								<li id="navregister"<?php ((FORUM_ACTIVE_PAGE == 'register') ? ' class="active"' : ''); ?>><a href="<?php echo $item['register']['url']; ?>"><?php echo $item['register']['title']; ?></a></li>
+								<li id="navregister"<?php ((LUNA_ACTIVE_PAGE == 'register') ? ' class="active"' : ''); ?>><a href="<?php echo $item['register']['url']; ?>"><?php echo $item['register']['title']; ?></a></li>
 								<li><a href="<?php echo $item['login']['url']; ?>" data-toggle="modal" data-target="#login-form"><?php echo $item['login']['title']; ?></a></li>
 <?php
 } else if (!empty($items['user'])) {
@@ -45,10 +45,6 @@ if (!empty($items['guest'])) {
 										<li><a href="<?php echo $item['logout']['url']; ?>"><?php echo $item['logout']['title']; ?></a></li>
 									</ul>
 								</li>
-								<li id="navlogout" class="hide-if-js">
-									<a href="<?php echo $item['logout']['url']; ?>" title="<?php echo $item['logout']['title']; ?>">
-										<span class="fa fa-fw fa-sign-out"></span>
-									</a>
-								</li>
+								<li id="navlogout" class="hide-if-js"><a href="<?php echo $item['logout']['url']; ?>"><?php echo $item['logout']['title']; ?>"></a></li>
 <?php } ?>
 							</ul>

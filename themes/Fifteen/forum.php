@@ -6,9 +6,9 @@ if (!defined('FORUM'))
 
 ?>
 </div>
-<div class="jumbotron">
+<div class="jumbotron" style="background-color: <?php echo $cur_forum['color']; ?>;">
 	<div class="container">
-		<h2 class="forum-title"><?php echo luna_htmlspecialchars($cur_forum['forum_name']) ?></h2><span class="pull-right"><?php echo $post_link ?><?php echo $paging_links ?></span>
+		<h2 class="forum-title"><?php echo $faicon.luna_htmlspecialchars($cur_forum['forum_name']) ?></h2><span class="pull-right naviton"><?php echo $paging_links ?><?php echo $comment_link ?></span>
 		<div class="forum-desc"><?php echo $cur_forum['forum_desc'] ?></div>
 	</div>
 </div>
@@ -26,20 +26,23 @@ if (!defined('FORUM'))
 				</div>
 				<hr />
 			<?php endif; ?>
-			<div class="list-group list-group-forum">
-				<?php draw_forum_list() ?>
+			<div class="forum-list hidden-xs">
+				<div class="list-group list-group-forum">
+					<?php draw_forum_list('forum.php', 1, 'category.php', '') ?>
+				</div>
+				<hr />
 			</div>
-			<hr />
 			<div class="list-group list-group-forum">
 				<?php draw_mark_read('list-group-item', 'forumview') ?>
 				<?php if ($id != '0' && $is_admmod) { ?>
 					<a class="list-group-item" href="backstage/moderate.php?fid=<?php echo $forum_id ?>&p=<?php echo $p ?>"><span class="fa fa-fw fa-eye"></span> <?php _e('Moderate forum', 'luna') ?></a>
 				<?php } ?>
 			</div>
+			<div class="visible-xs-block"><hr /></div>
 		</div>
 		<div class="col-sm-9">
-			<div class="list-group list-group-topic">
-				<?php draw_topics_list(); ?>
+			<div class="list-group list-group-thread">
+				<?php draw_threads_list(); ?>
 			</div>
 		</div>
 	</div>

@@ -7,8 +7,8 @@
  * Licensed under GPLv3 (http://getluna.org/license.php)
  */
 
-define('FORUM_ROOT', '../');
-require FORUM_ROOT.'include/common.php';
+define('LUNA_ROOT', '../');
+require LUNA_ROOT.'include/common.php';
 
 if (!$is_admin)
 	header("Location: login.php");
@@ -62,17 +62,17 @@ if (isset($_POST['add_user'])) {
 	// Insert the new user into the database. We do this now to get the last inserted id for later use.
 	$now = time();
 
-	$intial_group_id = ($_POST['random_pass'] == '0') ? $luna_config['o_default_user_group'] : FORUM_UNVERIFIED;
+	$intial_group_id = ($_POST['random_pass'] == '0') ? $luna_config['o_default_user_group'] : LUNA_UNVERIFIED;
 	$password_hash = luna_hash($password);
 
 	// Add the user
-	$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, email_setting, timezone, language, style, registered, registration_ip, last_visit) VALUES(\''.$db->escape($username).'\', '.$intial_group_id.', \''.$password_hash.'\', \''.$email1.'\', '.$email_setting.', '.$timezone.' , \''.$language.'\', \''.$luna_config['o_default_style'].'\', '.$now.', \''.get_remote_address().'\', '.$now.')') or error('Unable to create user', __FILE__, __LINE__, $db->error());
+	$db->query('INSERT INTO '.$db->prefix.'users (username, group_id, password, email, email_setting, php_timezone, language, style, registered, registration_ip, last_visit) VALUES(\''.$db->escape($username).'\', '.$intial_group_id.', \''.$password_hash.'\', \''.$email1.'\', '.$email_setting.', '.$timezone.' , \''.$language.'\', \''.$luna_config['o_default_style'].'\', '.$now.', \''.get_remote_address().'\', '.$now.')') or error('Unable to create user', __FILE__, __LINE__, $db->error());
 	$new_uid = $db->insert_id();
 
 	// Must the user verify the registration?
 	if ($_POST['random_pass'] == '1') {
 		// Validate e-mail
-		require FORUM_ROOT.'include/email.php';
+		require LUNA_ROOT.'include/email.php';
 
 		// Load the "welcome" template
 		$mail_tpl = trim(__('Subject: Welcome to <board_title>!
@@ -102,8 +102,8 @@ Login at <login_url> to activate the account.
 	}
 
 	// Regenerate the users info cache
-	if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
-		require FORUM_ROOT.'include/cache.php';
+	if (!defined('LUNA_CACHE_FUNCTIONS_LOADED'))
+		require LUNA_ROOT.'include/cache.php';
 
 	generate_users_info_cache();
 	
@@ -111,16 +111,16 @@ Login at <login_url> to activate the account.
 }
 
 $page_title = array(luna_htmlspecialchars($luna_config['o_board_title']), __('Admin', 'luna'), __('Users', 'luna'));
-define('FORUM_ACTIVE_PAGE', 'admin');
+define('LUNA_ACTIVE_PAGE', 'admin');
 require 'header.php';
 load_admin_nav('users', 'tools');
 
 if (isset($_GET['saved']))
-	echo '<div class="alert alert-success"><h4>'.__('Your settings have been saved.', 'luna').'</h4></div>';
+	echo '<div class="alert alert-success">'.__('Your settings have been saved.', 'luna').'</div>';
 if (isset($_GET['user_created']))
-	echo '<div class="alert alert-success"><h4>'.__('User created', 'luna').'</h4></div>';
+	echo '<div class="alert alert-success">'.__('User created', 'luna').'</div>';
 if (isset($_GET['user_failed']))
-	echo '<div class="alert alert-danger"><h4>'.__('Failed to create user, no password was given.', 'luna').'</h4></div>';
+	echo '<div class="alert alert-danger">'.__('Failed to create user, no password was given.', 'luna').'</div>';
 ?>
 <form class="form-horizontal" method="post" action="<?php echo $_SERVER['REQUEST_URI'] ?>">
 	<div class="panel panel-default">
@@ -132,7 +132,7 @@ if (isset($_GET['user_failed']))
 				<div class="form-group">
 					<label class="col-sm-3 control-label"><?php _e('Username', 'luna') ?></label>
 					<div class="col-sm-9">
-						<input type="text" class="form-control" name="username" tabindex="26" required="required" />
+						<input type="text" maxlength="25" class="form-control" name="username" tabindex="26" required="required" />
 					</div>
 				</div>
 				<div class="form-group">

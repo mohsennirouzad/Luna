@@ -5,7 +5,7 @@
  * Licensed under GPLv3 (http://getluna.org/license.php)
  */
 
-define('FORUM_ROOT', '../');
+define('LUNA_ROOT', '../');
 require '../include/common.php';
 
 if (!$is_admin)
@@ -123,7 +123,7 @@ if ($db->num_rows($result)) {
 								<input type="text" class="form-control" name="item[<?php echo $cur_item['id'] ?>][url]" value="<?php echo $cur_item['url'] ?>" <?php if ($cur_item['sys_entry'] == 1) echo ' readonly' ?> />
 							</td>
 							<td>
-								<input type="text" class="form-control" name="item[<?php echo $cur_item['id'] ?>][order]" value="<?php echo $cur_item['disp_position'] ?>" />
+								<input type="number" class="form-control" name="item[<?php echo $cur_item['id'] ?>][order]" value="<?php echo $cur_item['disp_position'] ?>" />
 							</td>
 							<td>
 								<input type="checkbox" value="1" name="item[<?php echo $cur_item['id'] ?>][visible]" <?php if ($cur_item['visible'] == 1) echo ' checked' ?> />

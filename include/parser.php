@@ -387,7 +387,7 @@ function preparse_tags($text, &$errors, $is_signature = false) {
 
 								if (!in_array($temp_tag, $tags_fix)) {
 									// We couldn't fix nesting
-									$errors[] = sprintf(__('[%1$s] was found without a matching [/%1$s]', 'luna'), array_pop($temp_opened));
+									$errors[] = sprintf(__('[%1$s] was found without a matching [/%1$s]', 'luna'), $temp_tag);
 									return false;
 								}
 								array_push($temp_opened, $temp_tag);
@@ -598,7 +598,7 @@ function handle_img_tag($url, $is_signature = false, $alt = null) {
 	if ($is_signature && $luna_user['show_img_sig'] != '0')
 		$img_tag = '<img class="sigimage img-responsive" src="'.$url.'" alt="'.$alt.'" />';
 	elseif (!$is_signature && $luna_user['show_img'] != '0')
-		$img_tag = '<span class="postimg"><img class="img-responsive" src="'.$url.'" alt="'.$alt.'" /></span>';
+		$img_tag = '<span class="commentimg"><img class="img-responsive" src="'.$url.'" alt="'.$alt.'" /></span>';
 
 	return $img_tag;
 }
@@ -636,7 +636,7 @@ function do_bbcode($text, $is_signature = false) {
 
 	if (strpos($text, '[quote') !== false) {
 		$text = preg_replace('%\[quote\]\s*%', '</p><blockquote><p>', $text);
-		$text = preg_replace_callback('%\[quote=(&quot;|&\#039;|"|\'|)(.*?)\\1\]%s', create_function('$matches', 'return "<blockquote><footer><cite>".str_replace(array(\'[\', \'\\"\'), array(\'&#91;\', \'"\'), $matches[2])." ".__(\'wrote\',\'luna\')."</cite></footer><p>";'), $text);
+		$text = preg_replace_callback('%\[quote=(&quot;|&\#039;|"|\'|)([^\r\n]*?)\\1\]%s', create_function('$matches', 'return "<blockquote><footer><cite>".str_replace(array(\'[\', \'\\"\'), array(\'&#91;\', \'"\'), $matches[2])." ".__(\'wrote\',\'luna\')."</cite></footer><p>";'), $text);
 		$text = preg_replace('%\s*\[\/quote\]%S', '</p></blockquote><p>', $text);
 	}
 	if (!$is_signature) {
@@ -890,7 +890,7 @@ function parse_message($text) {
 // Clean up paragraphs and line breaks
 //
 function clean_paragraphs($text) {
-	// Add paragraph tag around post, but make sure there are no empty paragraphs
+	// Add paragraph tag around comment, but make sure there are no empty paragraphs
 
 	$text = '<p>'.$text.'</p>';
 
